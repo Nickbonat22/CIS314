@@ -1,0 +1,89 @@
+.pos 0
+Init:
+	irmovl Stack, %ebp
+	irmovl Stack, %esp
+	call Main
+	halt
+
+	.align 10
+
+# array of length 10
+array:
+	.long 0x2
+	.long 0x4
+	.long 0x5
+	.long 0x6
+	.long 0x0
+	.long 0x8
+	.long 0x7
+	.long 0x9
+	.long 0x3
+	.long 0x1
+
+Main: pushl %ebp
+	rrmovl %esp, %ebp
+	irmovl $10,%eax
+	pushl %eax
+	irmovl array, %edx
+	pushl %edx # Push array
+	call Sort # Sort(array, 10)
+	rrmovl %ebp, %esp
+	popl %ebp
+	ret
+
+# bubble sort
+Sort:
+	pushl %ebp
+	rrmovl %esp, %ebp
+	pushl %ebx
+	mrmovl 8(%ebp), %ecx
+	mrmovl 12(%ebp) %edx
+	andl %edx, %edx
+	je Complete
+
+
+# the first loop in the bubble sort procedure
+FirstLoop:
+	mrmovl 8(%ebp), %ecx
+	mrmovl (%ecx), %esi
+	mrmovl 4(%ecx), %edi
+	irmovl $-1, %ebx
+	xorl %eax, %eax
+	addl %ebx, %edx
+	jne FirstLoop
+	jmp SecondLoop
+
+
+# the second loop in the bubble sort procedure
+SecondLoop:
+	#for loop
+	irmovl $1, %ebx
+	addl %ebx, %eax
+	rrmovl %esi, %ebx
+	subl %edi, %ebx
+	jle index
+	rrmovl %esi, %ebx
+	rmmovl %edi, (%ecx)
+	rmmovl %ebx, 4(%ecx)
+	jmp index
+
+# indexing into array
+index:
+	rrmovl %edx, %ebx
+	subl %eax, %ebx
+	je SecondLoop
+	irmovl $4, %ebx
+	addl %ebx, %ecx
+	mrmovl (%ecx), %esi
+	mrmovl 4(%ecx), %edi
+	jmp FirstLoop
+
+# finishing the operation
+Complete:
+	popl %ebx
+	rrmovl %ebp, %esp
+	popl %ebp
+	ret
+
+	.pos 0x200
+Stack:

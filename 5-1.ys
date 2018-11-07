@@ -1,0 +1,42 @@
+init:	irmovl Stack, %esp  	# Set up stack pointer  
+	irmovl Stack, %ebp  	# Set up base pointer   
+	call Main		# Execute main program
+	halt			# Terminate program 
+
+# Array of 4 elements
+	.align 4 	
+xp:	.long 0x0001
+yp:	.long 0x0002
+
+# main function that calls Swap
+Main:	pushl %ebp 
+	rrmovl %esp,%ebp
+	irmovl yp,%eax	
+	pushl %eax # push yp
+	irmovl xp,%eax
+	pushl %eax # push xp
+	call Swap
+	rrmovl %ebp,%esp
+	popl %ebp
+	ret 
+
+# swap procedure
+# int Swap(int *xp, int *yp)
+Swap:	pushl %ebp
+	pushl %ebx
+	rrmovl %esp,%ebp
+	mrmovl 8(%ebp),%ecx # xp in %ecx
+	mrmovl 12(%ebp),%edx # yp in %edx
+
+	mrmovl (%ecx),%ebx
+	mrmovl (%edx),%eax
+
+	rmmovl %eax,(%ecx)
+	rmmovl %ebx,(%edx)
+	
+	popl %ebx
+	popl %ebp
+	ret
+
+	.pos 0x100
+Stack:
